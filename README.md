@@ -1,19 +1,16 @@
-# Revisão de C com Allegro 5
+# Jogo desenvolvido em C++ com Allegro 5
 
-Este código demonstra algumas funcionalidades do Allegro, mas está precisando de muitas melhorias!!!
+Esse código se baseou no jogo desenvolvido para fins acadêmicos pelo aluno André Teiichi Santos Hyodo, que criou um jogo com proposta 
+educativa, baseado no clássico Space Invaders. O jogo possui uma nave que faz disparos em direção a "cometas", que apresentam as soluções
+para algumas questões matemáticas, que são apresentadas ao jogador.
 
-A ideia dessa aula é mostrar/rever alguns conceitos de C à medida em que se introduzem as melhorias que o código precisa, como:
+O desenvolvimento do código contou com o auxilio, em especial, da série de aulas do professor Raphael, com link no final dessa página.
 
-* Funções
-* Módulos (.c e .h)
-	* Variáveis e Funções _static_
-	* Variáveis _extern_
-* Macros e Constantes
-* Estruturas e Definição de Tipos
-* Ponteiros + Aloção e Desalocação de Memória
+
 
 ## Links úteis
 
+* https://www.youtube.com/watch?v=kc2SMzjdzNE&list=PL1ZamQxZZHMRUbYazCXCcNy3SW8LVmx1a&index=1
 * https://liballeg.org/
 * https://liballeg.org/a5docs/5.0.10/index.html
 * https://www.allegro.cc/files/
