@@ -578,5 +578,25 @@
 1537139759 c:\programacao\jogo_aeds_i\allegro-5.0.10-mingw-4.7.0\include\allegro5\allegro_native_dialog.h
 	"allegro5/allegro.h"
 
-1688353764 c:\programacao\jogo_aeds_i\objetos.h
+1688525792 c:\programacao\jogo_aeds_i\objetos.h
+
+1688530019 source:c:\programacao\jogo_aeds_i\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<allegro5/allegro.h>
+	<allegro5/allegro_primitives.h>
+	<allegro5/allegro_font.h>
+	<allegro5/allegro_ttf.h>
+	<allegro5/allegro_image.h>
+	<allegro5/allegro_audio.h>
+	<allegro5/allegro_native_dialog.h>
+	<allegro5/allegro_acodec.h>
+	<allegro5/allegro_primitives.h>
+	<allegro5/allegro_audio.h>
+	<allegro5/allegro_acodec.h>
+	<allegro5/allegro_image.h>
+	<cstdlib>
+	<ctime>
+	"allegro_util.h"
+	"objetos.h"
 

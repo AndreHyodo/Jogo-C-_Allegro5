@@ -46,3 +46,8 @@ typedef struct{
     int correct;
 }Calculo;
 
+typedef struct{
+    int pos_x;
+    int pos_y;
+}Mouse;
+

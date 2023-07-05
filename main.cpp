@@ -11,6 +11,7 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro_image.h>
 #include <cstdlib>
 #include <ctime>
 #include "allegro_util.h"
@@ -25,6 +26,8 @@ const int NUM_COMETAS = 4;
 const int NUM_ESTRELAS = 100;
 const int NUM_PLANOS = 3;
 bool attCalc = false;
+bool iniciaJogo = false;
+bool retomaJogo = false;
 
 ALLEGRO_SAMPLE *trilha_sonora = NULL;
 ALLEGRO_SAMPLE *laser = NULL;
@@ -83,6 +86,9 @@ int main()
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_FONT *font14 = NULL;
     ALLEGRO_FONT *font25 = NULL;
+    ALLEGRO_FONT *font50 = NULL;
+
+    ALLEGRO_BITMAP *imagem = NULL;
 
 
     bool fim = false;
@@ -90,6 +96,9 @@ int main()
     bool game_over = false;
     bool tocar_aplausos = false;
     bool teclas[] = {false,false,false,false,false, false};
+
+    int imageWidth=0;
+    int imageHeight=0;
 
 
     /*________________________________________
@@ -104,6 +113,7 @@ int main()
      Calculo calculo;
      RetornaCalc(calculo);
      Options(NUM_COMETAS,calculo);
+     Mouse mouse;
 
     /*____________________________________________________
      -------INICIALIZAÇÃO DA ALLEGRO E DO DISPLAY--------*/
@@ -129,11 +139,14 @@ int main()
     al_install_keyboard();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_install_mouse();
 
     al_install_audio();
     al_init_acodec_addon();
 
     al_reserve_samples(10);
+
+    al_init_image_addon();
 
     /*____________________________________________________
      -------CRIAÇÃO DA FILA E DEMAIS DISPOSITIVOS--------*/
@@ -142,9 +155,11 @@ int main()
      timer = al_create_timer(1.0/FPS);
      font14 = al_load_font("C:/Windows/Fonts/Arial.ttf", 14, NULL);
      font25 = al_load_font("C:/Windows/Fonts/Arial.ttf", 25, NULL);
+     font50 = al_load_font("C:/Windows/Fonts/Arial.ttf", 50, NULL);
 
      al_clear_to_color(al_map_rgb(0,0,0));
-     al_draw_text(font14,al_map_rgb(255,255,255), largura_t/2, altura_t/2, ALLEGRO_ALIGN_CENTER, "LOADING...");
+     al_draw_filled_rounded_rectangle(largura_t/2 - 150, altura_t/2 -25, largura_t/2+150, altura_t/2+50, 20, 20,al_map_rgb(255,0,0));
+     al_draw_text(font50,al_map_rgb(255,255,255), largura_t/2, altura_t/2-15, ALLEGRO_ALIGN_CENTER, "Start");
      al_flip_display();
 
      trilha_sonora = al_load_sample("trilha_sonora.ogg");
@@ -177,6 +192,7 @@ int main()
     al_register_event_source(fila_eventos,al_get_display_event_source(display));
     al_register_event_source(fila_eventos,al_get_keyboard_event_source());
     al_register_event_source(fila_eventos,al_get_timer_event_source(timer));
+    al_register_event_source(fila_eventos,al_get_mouse_event_source());
 
     /*________________________________
      -------FUNÇÕES INICIAIS--------*/
@@ -246,6 +262,27 @@ int main()
                     break;
             }
         }
+        else if(ev.type == ALLEGRO_EVENT_MOUSE_AXES){
+
+            mouse.pos_x = ev.mouse.x;
+            mouse.pos_y = ev.mouse.y;
+
+        }
+        else if(ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
+
+            if(mouse.pos_x>(largura_t/2 - 150)&&
+                mouse.pos_x<(largura_t/2 + 150)&&
+                mouse.pos_y>(altura_t/2 -25)&&
+                mouse.pos_y<(altura_t/2+50)){
+
+                    if(ev.mouse.button & 1){
+                        iniciaJogo = true;
+                        retomaJogo = true;
+                    }
+            }
+
+
+        }
         else if(ev.type == ALLEGRO_EVENT_TIMER){
             desenha = true;
 
@@ -260,7 +297,7 @@ int main()
             if(teclas[SPACE])
                 AtualizarBalas(balas,NUM_BALAS);
 
-            if(!game_over){
+            if(!game_over && iniciaJogo){
 
                 al_play_sample_instance(inst_trilha_sonora);
 
@@ -276,6 +313,7 @@ int main()
                 CometaColidido(cometas, NUM_COMETAS, nave);
 
                 if(nave.vidas <= 0){
+                    retomaJogo = false;
                     game_over = true;
                     tocar_aplausos = true;
                 }
@@ -290,7 +328,7 @@ int main()
                     tocar_aplausos = false;
                 }
 
-                if(teclas[ENTER]){
+                if(retomaJogo){
                     InitNave(nave);
                     InitBalas(balas, NUM_BALAS);
                     InitCometas(cometas, NUM_COMETAS, calculo);
@@ -309,8 +347,12 @@ int main()
 
         char questao[50];
         strcpy(questao, calculo.quest);
-
-        if(desenha && al_is_event_queue_empty(fila_eventos)){
+        /*
+        if(ev.mouse.button & 1){
+            iniciaJogo = true;
+            }
+        */
+        if(desenha && al_is_event_queue_empty(fila_eventos)&& iniciaJogo){
 
             desenha = false;
 
@@ -321,12 +363,16 @@ int main()
                 DesenhaBalas(balas,NUM_BALAS);
                 DesenhaCometas(cometas, NUM_COMETAS,font25,calculo);
 
-                al_draw_textf(font14, al_map_rgb(255,255,255),0,0,NULL,"VIDAS: %d    /  PONTOS: %d, vel: %f",nave.vidas, nave.pontos, cometas[0].velocidade);
-                al_draw_filled_rectangle(largura_t/2-120,0, largura_t/2+120, 30, al_map_rgb(255,255,255));
+                al_draw_textf(font14, al_map_rgb(255,255,255),0,0,NULL,"VIDAS: %d    /  PONTOS: %d",nave.vidas, nave.pontos);
+                al_draw_filled_rectangle(largura_t/2-120,0, largura_t/2+130, 30, al_map_rgb(255,255,255));
                 al_draw_textf(font25, al_map_rgb(0,0,0),largura_t/2-100,0,NULL,"Questao: %s",questao);
 
             }else{
-                al_draw_textf(font14, al_map_rgb(255,255,255), largura_t/2, altura_t/2, ALLEGRO_ALIGN_CENTER,"Fim de jogo. Seus pontos: %d. Tecle ENTER para jogar novamente ou ESC para sair do jogo.", nave.pontos);
+                al_draw_textf(font25, al_map_rgb(255,255,255), largura_t/2, altura_t/2-150, ALLEGRO_ALIGN_CENTER,"Fim de jogo");
+                al_draw_textf(font25, al_map_rgb(255,255,255), largura_t/2, altura_t/2-100, ALLEGRO_ALIGN_CENTER,"Seus pontos: %d", nave.pontos);
+                al_draw_textf(font25, al_map_rgb(255,255,255), largura_t/2, altura_t/2+100, ALLEGRO_ALIGN_CENTER,"Tecle ESC para sair do jogo.");
+                al_draw_filled_rounded_rectangle(largura_t/2 - 150, altura_t/2 -25, largura_t/2+150, altura_t/2+50, 20, 20,al_map_rgb(255,0,0));
+                al_draw_text(font50,al_map_rgb(255,255,255), largura_t/2, altura_t/2-15, ALLEGRO_ALIGN_CENTER, "Restart");
 
             }
 
@@ -357,6 +403,8 @@ int main()
     al_destroy_sample_instance(inst_laser);
     al_destroy_sample_instance(inst_acerto);
     al_destroy_sample_instance(inst_aplausos);
+
+    al_destroy_bitmap(imagem);
 
     return 0;
 }
